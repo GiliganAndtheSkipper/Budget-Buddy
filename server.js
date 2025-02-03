@@ -1,33 +1,25 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-
-// log enviroment variables to verify they'reloading properly  
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
-console.log("DB_DATABASE:", process.env.DB_DATABASE);
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_PORT:", process.env.DB_PORT);
-
 const expenseRoutes = require('./routes/expense');
 
-// Running express server
 const app = express();
 const port = process.env.PORT || 8000;
 
-// Use CORS middleware
 app.use(cors());
-
-// Middleware to parse JSON data
 app.use(express.json());
 
-// Registering the routes with proper prefix
+// ✅ Serve static frontend files from React build
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// ✅ API Routes
 app.use('/api', expenseRoutes);
 
-// Root route
-app.get('/', (req, res) => {
-  res.send('Welcome to the Budget Buddy API');
+// ✅ Serve React frontend for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 
 app.use((req, res) => {
@@ -35,6 +27,5 @@ app.use((req, res) => {
 });
 
 app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`App listening at http://localhost:${port}`);
+  console.log(`App running at http://budgetbuddy.com:${port}`);
 });
